@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Qwen OCR 识别函数
  * @param {string} base64 - 图片的 base64 编码（未使用，通过缓存文件读取）
  * @param {string} lang - 语言设置
@@ -218,7 +218,18 @@ async function performOCR(fetch, http, token, cookie, model, fileContent, prompt
     });
 
     if (!recognitionResponse.ok) {
-      throw new Error(`OCR 请求失败: HTTP ${recognitionResponse.status}`);
+      let errorMessage = `OCR 请求失败: HTTP ${recognitionResponse.status}`;
+      if (recognitionResponse.statusText) {
+        errorMessage += ` ${recognitionResponse.statusText}`;
+      }
+      if (recognitionResponse.data) {
+        try {
+          errorMessage += `。响应体: ${JSON.stringify(recognitionResponse.data)}`;
+        } catch (e) {
+          errorMessage += `。响应体: [无法序列化]`;
+        }
+      }
+      throw new Error(errorMessage);
     }
 
     const recognitionData = recognitionResponse.data;
